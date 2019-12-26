@@ -1,0 +1,29 @@
+--Khi can thay doi so led chi can thay doi entity cua q va gia tri cua constant n_led
+--Nhung thong so can sua co dau #####
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity LED_STD_PHAI_SANG_TRAI is
+	port(	ck: in std_logic;
+			ena_db, oe,rst: in std_logic;
+			q: out std_logic_vector(15 downto 0));			--#####
+end LED_STD_PHAI_SANG_TRAI;
+architecture behavioral of LED_STD_PHAI_SANG_TRAI is
+constant n_led:integer :=15;									--##### Dung n led thi dien n-1
+signal q_reg,q_next: std_logic_vector(n_led downto 0);
+begin
+	--register block
+	process(ck, rst)
+	begin
+		if rst='1' then q_reg <= (others=>'0');
+		elsif falling_edge(ck) then q_reg<= q_next;
+		end if;
+	end process;
+	--next state block
+	q_next<= (others=>'0') when oe= '0' else
+				q_reg(n_led-1 downto 0)& not q_reg(n_led)  when ena_db='1' else
+				q_reg;
+	-- output block
+	q<= 	q_reg when oe = '1' else
+			(others=>'0');
+end behavioral;
